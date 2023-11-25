@@ -11,14 +11,21 @@ import validateRegistration, {
   validateId,
   validateUpdateUser,
 } from "../middleware/registerUserValidator";
+import authenticateToken from "../middleware/authenticateToken";
 
 const router = Router();
 
 router.post("/register", validateRegistration, registerUser);
 router.post("/login", login);
-router.get("/get-users", getAllUsers);
-router.get("/get-user/:id", validateId, getUserById);
-router.patch("/update-user/:id", validateId, validateUpdateUser, updateUser);
-router.delete("/delete-user/:id", validateId, deleteUser);
+router.get("/get-users", authenticateToken, getAllUsers);
+router.get("/get-user/:id", authenticateToken, validateId, getUserById);
+router.patch(
+  "/update-user/:id",
+  authenticateToken,
+  validateId,
+  validateUpdateUser,
+  updateUser
+);
+router.delete("/delete-user/:id", authenticateToken, validateId, deleteUser);
 
 export default router;
