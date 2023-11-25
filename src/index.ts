@@ -9,8 +9,8 @@ const PORT = process.env.PORT || 8000;
 const MONGO_URI = process.env.MONGODB_URI || "";
 
 app.use(express.json());
-app.use("/api/v1", productRoutes);
 app.use("/api/v1", userRoutes);
+app.use("/api/v1", productRoutes);
 
 mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,

@@ -7,10 +7,11 @@ import {
   registerUser,
   updateUser,
 } from "../controllers/userController";
-import validateRegistration, {
+import {
+  validateRegistration,
   validateId,
   validateUpdateUser,
-} from "../middleware/registerUserValidator";
+} from "../middleware/userRouteValidators";
 import authenticateToken from "../middleware/authenticateToken";
 
 const router = Router();

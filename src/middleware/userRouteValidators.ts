@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { body, validationResult, check } from "express-validator";
 
 // Validation middleware
-const validateRegistration = [
+export const validateRegistration = [
   body("firstName").notEmpty().withMessage("First name is required"),
   body("lastName").notEmpty().withMessage("Last name is required"),
   body("email").isEmail().withMessage("Invalid email address"),
@@ -15,8 +15,6 @@ const validateRegistration = [
     next();
   },
 ];
-
-export default validateRegistration;
 
 export const validateId = [
   check("id").isMongoId().withMessage("Invalid MongoDB ID"),

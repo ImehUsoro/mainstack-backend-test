@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUser = exports.getUserById = exports.getAllUsers = exports.login = exports.registerUser = void 0;
+exports.deleteUser = exports.updateUser = exports.getUserById = exports.getAllUsers = exports.login = exports.registerUser = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const User_1 = __importDefault(require("../models/User"));
 const utils_1 = require("../utils/utils");
@@ -32,7 +32,11 @@ const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         });
         yield newUser.save();
         const userObject = newUser.toObject();
-        return res.status(201).json({ message: "success", user: userObject });
+        return res.status(201).json({
+            status: "success",
+            message: "User successfully created",
+            user: userObject,
+        });
     }
     catch (error) {
         console.error(error);
@@ -57,7 +61,12 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             firstName: user.firstName,
             lastName: user.lastName,
         });
-        return res.status(201).json({ message: "success", user, accessToken });
+        return res.status(201).json({
+            status: "success",
+            message: "Login successful",
+            user,
+            accessToken,
+        });
     }
     catch (error) {
         console.error(error);
@@ -68,7 +77,11 @@ exports.login = login;
 const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const users = yield User_1.default.find({}).select("-password");
-        return res.status(200).json({ message: "success", users });
+        return res.status(200).json({
+            status: "success",
+            message: "Users successfully retrieved",
+            users,
+        });
     }
     catch (error) {
         console.error(error);
@@ -83,7 +96,11 @@ const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
-        return res.status(200).json({ message: "success", user });
+        return res.status(200).json({
+            status: "success",
+            message: "User successfully retrieved",
+            user,
+        });
     }
     catch (error) {
         console.error(error);
@@ -92,22 +109,40 @@ const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 });
 exports.getUserById = getUserById;
 const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const { email, firstName, lastName } = req.body;
     try {
+        const { id } = req.params;
+        const { firstName, lastName } = req.body.userData;
         const user = yield User_1.default.findById(id);
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
-        user.email = email || user.email;
         user.firstName = firstName || user.firstName;
         user.lastName = lastName || user.lastName;
         yield user.save();
-        return res.status(200).json({ message: "success", user });
+        return res
+            .status(200)
+            .json({ status: "success", message: "User updated successfully", user });
     }
     catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Internal Server Error" });
+        console.error("Error updating user:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
     }
 });
 exports.updateUser = updateUser;
+const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const user = yield User_1.default.findByIdAndDelete(id);
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        return res
+            .status(200)
+            .json({ status: "success", message: "User deleted successfully" });
+    }
+    catch (error) {
+        console.error("Error deleting user:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+exports.deleteUser = deleteUser;

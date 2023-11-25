@@ -23,7 +23,6 @@ const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
       return res.status(403).json({ error: "Forbidden" });
     }
     req.user = user as Record<string, UserPayload>;
-    console.log("user", req.user);
     next();
   });
 };

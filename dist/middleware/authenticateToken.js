@@ -10,7 +10,7 @@ const authenticateToken = (req, res, next) => {
     if (!token) {
         return res.status(401).json({ error: "Unauthorized" });
     }
-    jsonwebtoken_1.default.verify(token, "your-secret-key", (err, user) => {
+    jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET, (err, user) => {
         if (err) {
             return res.status(403).json({ error: "Forbidden" });
         }

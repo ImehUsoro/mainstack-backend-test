@@ -12,8 +12,8 @@ const app = (0, express_1.default)();
 const PORT = process.env.PORT || 8000;
 const MONGO_URI = process.env.MONGODB_URI || "";
 app.use(express_1.default.json());
-app.use("/api/v1", productRoutes_1.default);
 app.use("/api/v1", userRoutes_1.default);
+app.use("/api/v1", productRoutes_1.default);
 mongoose_1.default.connect(MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,

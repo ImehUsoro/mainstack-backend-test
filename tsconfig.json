@@ -8,3 +8,18 @@
     "esModuleInterop": true
   }
 }
+
+// {
+//   "compilerOptions": {
+//     "target": "es6",
+//     "module": "commonjs",
+//     "strict": true,
+//     "esModuleInterop": true,
+//     "skipLibCheck": true,
+//     "forceConsistentCasingInFileNames": true,
+//     "outDir": "./dist",
+//     "types": ["node"]
+//   },
+//   "include": ["src/**/*.ts"],
+//   "exclude": ["node_modules"]
+// }
