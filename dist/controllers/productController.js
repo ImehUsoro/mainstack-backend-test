@@ -8,61 +8,42 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getProducts = exports.createProductWithUpload = exports.createProduct = void 0;
-const Product_1 = __importDefault(require("../models/Product"));
-const multer_1 = __importDefault(require("multer"));
-const cloudinaryConfig_1 = __importDefault(require("../config/cloudinaryConfig"));
-const storage = multer_1.default.memoryStorage();
-const upload = (0, multer_1.default)({ storage: storage });
-const singleUpload = upload.single("image");
+exports.deleteProduct = exports.updateProductSpecifications = exports.updateProductImage = exports.updateProduct = exports.getProductsByCategory = exports.searchProduct = exports.getProductById = exports.getProducts = exports.createProduct = void 0;
+const express_validator_1 = require("express-validator");
+const productService_1 = require("../services/productService");
 const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        // if (!req.file) {
-        //   return res.status(400).json({ error: "File is required" });
-        // }
-        const { name, category, description, quantityInStock, visibility, specifications, } = req.body;
-        const result = yield cloudinaryConfig_1.default.uploader.upload(req.file.buffer.toString("base64"));
-        const newProduct = new Product_1.default({
-            name,
-            category,
-            description,
-            quantityInStock,
-            visibility,
-            specifications,
-            image_url: result.secure_url,
-        });
-        yield newProduct.save();
-        return res
-            .status(201)
-            .json({ message: "Product created successfully", product: newProduct });
-    }
-    catch (error) {
-        res.status(500).json({ error: "Internal Server Error" });
-    }
+    const data = (0, express_validator_1.matchedData)(req);
+    yield (0, productService_1.createProductService)(req, res, data);
 });
 exports.createProduct = createProduct;
-const singleUploadMiddleware = (req, res, next) => {
-    singleUpload(req, res, (err) => {
-        if (err) {
-            return res
-                .status(400)
-                .json({ error: "File upload error", message: err.message });
-        }
-        next();
-    });
-};
-exports.createProductWithUpload = [singleUploadMiddleware, exports.createProduct];
 const getProducts = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const products = yield Product_1.default.find();
-        res.json(products);
-    }
-    catch (error) {
-        res.status(500).json({ error: "Internal Server Error" });
-    }
+    yield (0, productService_1.getAllProductsService)(res);
 });
 exports.getProducts = getProducts;
+const getProductById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = (0, express_validator_1.matchedData)(req);
+    yield (0, productService_1.getProductByIdAndRespondService)(id, res);
+});
+exports.getProductById = getProductById;
+const searchProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { name, category, page, pageSize } = (0, express_validator_1.matchedData)(req);
+    yield (0, productService_1.searchProductService)(name, res, page, pageSize, category);
+});
+exports.searchProduct = searchProduct;
+const getProductsByCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { category, page, pageSize } = (0, express_validator_1.matchedData)(req);
+    yield (0, productService_1.getProductsByCategoryService)(category, res, page, pageSize);
+});
+exports.getProductsByCategory = getProductsByCategory;
+const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () { });
+exports.updateProduct = updateProduct;
+const updateProductImage = (req, res) => __awaiter(void 0, void 0, void 0, function* () { });
+exports.updateProductImage = updateProductImage;
+const updateProductSpecifications = (req, res) => __awaiter(void 0, void 0, void 0, function* () { });
+exports.updateProductSpecifications = updateProductSpecifications;
+const deleteProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = (0, express_validator_1.matchedData)(req);
+    yield (0, productService_1.deleteProductService)(id, res);
+});
+exports.deleteProduct = deleteProduct;

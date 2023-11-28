@@ -8,141 +8,36 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteUser = exports.updateUser = exports.getUserById = exports.getAllUsers = exports.login = exports.registerUser = void 0;
-const bcrypt_1 = __importDefault(require("bcrypt"));
-const User_1 = __importDefault(require("../models/User"));
-const utils_1 = require("../utils/utils");
+const userService_1 = require("../services/userService");
 const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { password, email, firstName, lastName } = req.body;
-        const existingUser = yield User_1.default.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ error: "This email already exists" });
-        }
-        const hashedPassword = yield bcrypt_1.default.hash(password, 10);
-        const newUser = new User_1.default({
-            email,
-            firstName,
-            lastName,
-            password: hashedPassword,
-        });
-        yield newUser.save();
-        const userObject = newUser.toObject();
-        return res.status(201).json({
-            status: "success",
-            message: "User successfully created",
-            user: userObject,
-        });
-    }
-    catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
+    const { body } = req;
+    yield (0, userService_1.createUserService)(body, res);
 });
 exports.registerUser = registerUser;
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { email, password } = req.body;
-        const user = yield User_1.default.findOne({ email });
-        if (!user) {
-            return res.status(401).json({ error: "Invalid credentials" });
-        }
-        const passwordMatch = yield bcrypt_1.default.compare(password, user.password);
-        if (!passwordMatch) {
-            return res.status(401).json({ error: "Invalid credentials" });
-        }
-        const accessToken = (0, utils_1.generateAccessToken)({
-            email,
-            id: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
-        });
-        return res.status(201).json({
-            status: "success",
-            message: "Login successful",
-            user,
-            accessToken,
-        });
-    }
-    catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
+    const { body } = req;
+    yield (0, userService_1.loginService)(body, res);
 });
 exports.login = login;
-const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const users = yield User_1.default.find({}).select("-password");
-        return res.status(200).json({
-            status: "success",
-            message: "Users successfully retrieved",
-            users,
-        });
-    }
-    catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
+const getAllUsers = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, userService_1.getAllUsersService)(res);
 });
 exports.getAllUsers = getAllUsers;
 const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    try {
-        const user = yield User_1.default.findById(id).select("-password");
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
-        return res.status(200).json({
-            status: "success",
-            message: "User successfully retrieved",
-            user,
-        });
-    }
-    catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
+    yield (0, userService_1.findUserByIdAndRespondService)(id, res);
 });
 exports.getUserById = getUserById;
 const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { id } = req.params;
-        const { firstName, lastName } = req.body.userData;
-        const user = yield User_1.default.findById(id);
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
-        user.firstName = firstName || user.firstName;
-        user.lastName = lastName || user.lastName;
-        yield user.save();
-        return res
-            .status(200)
-            .json({ status: "success", message: "User updated successfully", user });
-    }
-    catch (error) {
-        console.error("Error updating user:", error);
-        return res.status(500).json({ error: "Internal Server Error" });
-    }
+    const { id } = req.params;
+    const { userData } = req.body;
+    yield (0, userService_1.updateUserByIdService)(id, userData, res);
 });
 exports.updateUser = updateUser;
 const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { id } = req.params;
-        const user = yield User_1.default.findByIdAndDelete(id);
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
-        return res
-            .status(200)
-            .json({ status: "success", message: "User deleted successfully" });
-    }
-    catch (error) {
-        console.error("Error deleting user:", error);
-        return res.status(500).json({ error: "Internal Server Error" });
-    }
+    const { id } = req.params;
+    yield (0, userService_1.deleteUserByIdService)(id, res);
 });
 exports.deleteUser = deleteUser;

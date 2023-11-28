@@ -3,6 +3,7 @@ import { CreateProductDto } from "../dtos/products";
 import Product from "../models/Product";
 import { uploadToCloudinary } from "../utils/fileUploader";
 import { findCategoryBySearchedNameService } from "./categoryService";
+import { get } from "mongoose";
 
 export const createProductService = async (
   req: Request,
@@ -112,10 +113,11 @@ export const searchProductService = async (
     query.name = { $regex: new RegExp(name, "i") };
   }
 
-  const foundCategory = await findCategoryBySearchedNameService(category || "");
-
-  if (foundCategory) {
-    query.category = foundCategory._id;
+  if (category) {
+    const foundCategory = await findCategoryBySearchedNameService(category);
+    if (foundCategory) {
+      query.category = foundCategory._id;
+    }
   }
 
   const skip = (page - 1) * pageSize;
@@ -132,5 +134,59 @@ export const searchProductService = async (
     status: "success",
     message: "Successfully retrieved all Products",
     data: { products, total, currentPage, pageSize, totalPages },
+  });
+};
+
+export const getProductsByCategoryService = async (
+  category: string,
+  res: Response,
+  page: number = 1,
+  pageSize: number = 10
+) => {
+  const foundCategory = await findCategoryBySearchedNameService(category);
+
+  if (!foundCategory) {
+    return res
+      .status(404)
+      .json({ status: "error", error: "Category not found" });
+  }
+
+  const skip = (page - 1) * pageSize;
+
+  const [products, total] = await Promise.all([
+    Product.find({ category: foundCategory._id })
+      .skip(skip)
+      .limit(pageSize)
+      .sort({ createdAt: -1 }),
+    Product.countDocuments({ category: foundCategory._id }),
+  ]);
+
+  const totalPages = Math.ceil(total / pageSize);
+  const currentPage = page > totalPages ? totalPages : page;
+
+  res.status(200).json({
+    status: "success",
+    message: "Successfully retrieved all Products",
+    data: { products, total, currentPage, pageSize, totalPages },
+  });
+};
+
+export const deleteProductService = async (
+  productId: string,
+  res: Response
+) => {
+  const product = await getProductByIdService(productId);
+
+  if (!product) {
+    return res
+      .status(404)
+      .json({ status: "error", error: "Product not found" });
+  }
+
+  await Product.deleteOne({ _id: productId });
+
+  return res.status(200).json({
+    status: "success",
+    message: "Successfully deleted a Product",
   });
 };

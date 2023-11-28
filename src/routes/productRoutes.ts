@@ -1,12 +1,18 @@
 import { Router } from "express";
 import {
   createProduct,
+  deleteProduct,
   getProductById,
   getProducts,
+  getProductsByCategory,
   searchProduct,
+  updateProduct,
+  updateProductImage,
+  updateProductSpecifications,
 } from "../controllers/productController";
 import authenticateToken from "../middleware/authenticateToken";
 import {
+  validateGetProductsByCategory,
   validateProduct,
   validateSearchProducts,
 } from "../middleware/productRouteValidators";
@@ -25,6 +31,7 @@ router.post(
   createProduct
 );
 router.get("/get-products", authenticateToken, getProducts);
+
 router.get(
   "/get-product/:id",
   authenticateToken,
@@ -32,6 +39,7 @@ router.get(
   validate,
   getProductById
 );
+
 router.get(
   "/search-product",
   authenticateToken,
@@ -39,13 +47,46 @@ router.get(
   validate,
   searchProduct
 );
-router.patch("/update-product/:id", authenticateToken, validateId);
-router.patch("/update-product-image/:id", authenticateToken, validateId);
+
+router.get(
+  "/get-products-by-category",
+  authenticateToken,
+  validateGetProductsByCategory,
+  validate,
+  getProductsByCategory
+);
+
+router.patch(
+  "/update-product/:id",
+  authenticateToken,
+  validateId,
+  validate,
+  updateProduct
+);
+
+router.patch(
+  "/update-product-image/:id",
+  authenticateToken,
+  uploadSingle,
+  validateId,
+  validate,
+  updateProductImage
+);
+
 router.patch(
   "/update-product-specifications/:id",
   authenticateToken,
-  validateId
+  validateId,
+  validate,
+  updateProductSpecifications
 );
-router.delete("/delete-product/:id", authenticateToken, validateId);
+
+router.delete(
+  "/delete-product/:id",
+  authenticateToken,
+  validateId,
+  validate,
+  deleteProduct
+);
 
 export { router as productRoutes };

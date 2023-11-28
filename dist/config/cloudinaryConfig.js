@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+require("dotenv").config();
 const cloudinary_1 = require("cloudinary");
 cloudinary_1.v2.config({
-    cloud_name: "dk35lvftm",
-    api_key: "316769377275616",
-    api_secret: "nXLWaIPtVHla8m3R907GZ22_2KM",
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 exports.default = cloudinary_1.v2;

@@ -43,3 +43,12 @@ export const validateSearchProducts = [
     .withMessage("Invalid pageSize"),
   query("page").optional().isInt({ min: 1 }).withMessage("Invalid page"),
 ];
+
+export const validateGetProductsByCategory = [
+  query("category").exists().withMessage("Category is required"),
+  query("pageSize")
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage("Invalid pageSize"),
+  query("page").optional().isInt({ min: 1 }).withMessage("Invalid page"),
+];
