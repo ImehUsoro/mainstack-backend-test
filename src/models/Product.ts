@@ -21,6 +21,7 @@ const specificationSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
+    unique: false,
   },
   price: {
     type: Number,
@@ -28,7 +29,7 @@ const specificationSchema = new mongoose.Schema({
   },
 });
 
-const ProductSchema: Schema = new Schema(
+const ProductSchema: Schema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -40,8 +41,9 @@ const ProductSchema: Schema = new Schema(
       required: false,
     },
     category: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
+      ref: "Category",
     },
     description: {
       type: String,

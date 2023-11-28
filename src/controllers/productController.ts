@@ -1,60 +1,54 @@
-import { NextFunction, Request, Response } from "express";
-import multer from "multer";
+import { Request, Response } from "express";
 import cloudinary from "../config/cloudinaryConfig";
 import Product from "../models/Product";
-
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
-
-const singleUpload = upload.single("image");
+import { matchedData } from "express-validator";
 
 export const createProduct = async (req: Request, res: Response) => {
+  const { specifications, image, ...data } = matchedData(req);
+
   try {
     if (!req.file) {
       res.status(400).send("No file uploaded");
       return;
     }
 
-    // if (!req.body.specifications) {
-    //   res.status(400).send("Specifications not provided");
-    //   return;
-    // }
+    const matchQuery = { $or: [{ name: data.name }] };
 
-    const specifications = JSON.parse(req.body.specifications);
+    const existingProduct = await Product.findOne(matchQuery);
 
-    const result = await cloudinary.uploader.upload(req.file.path);
+    if (existingProduct) {
+      res.status(400).json({ error: "This Product already exists" });
+      return;
+    }
 
-    const product = new Product({
-      ...req.body,
-      specifications,
-      image_url: result.secure_url,
+    const folderPath = "mainstack/";
+
+    const publicId = folderPath + Date.now();
+
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      public_id: publicId,
     });
 
-    await product.save();
+    const parsedSpecifications = JSON.parse(specifications);
 
-    res.status(201).send(product);
+    const userData = {
+      ...data,
+      specifications: parsedSpecifications,
+      image_url: result.secure_url,
+    };
+
+    const product = await Product.create(userData);
+    const sendProduct = await product.populate({
+      path: "category",
+      select: "_id name",
+    });
+
+    res.status(201).send(sendProduct);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
-const singleUploadMiddleware = (
-  req: Request & { file: File },
-  res: Response,
-  next: NextFunction
-) => {
-  singleUpload(req, res, (err: any) => {
-    if (err) {
-      return res
-        .status(400)
-        .json({ error: "File upload error", message: err.message });
-    }
-    next();
-  });
-};
-
-export const createProductWithUpload = [singleUploadMiddleware, createProduct];
 
 export const getProducts = async (_req: Request, res: Response) => {
   try {

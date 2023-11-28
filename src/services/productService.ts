@@ -1,0 +1,1 @@
+// const createProduct = async (data) => {};

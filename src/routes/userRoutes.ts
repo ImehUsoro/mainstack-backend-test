@@ -29,4 +29,4 @@ router.patch(
 );
 router.delete("/delete-user/:id", authenticateToken, validateId, deleteUser);
 
-export default router;
+export { router as userRoutes };
