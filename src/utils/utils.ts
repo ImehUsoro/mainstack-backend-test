@@ -1,5 +1,3 @@
-// write functions for jwt here
-
 import jwt from "jsonwebtoken";
 
 export interface UserPayload {

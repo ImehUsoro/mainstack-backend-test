@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
+import { matchedData } from "express-validator";
 import cloudinary from "../config/cloudinaryConfig";
 import Product from "../models/Product";
-import { matchedData } from "express-validator";
 
 export const createProduct = async (req: Request, res: Response) => {
   const { specifications, image, ...data } = matchedData(req);

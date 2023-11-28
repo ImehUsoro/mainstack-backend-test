@@ -1,5 +1,4 @@
-import { Request, Response, NextFunction } from "express";
-import { body, validationResult, check } from "express-validator";
+import { check } from "express-validator";
 
 export const validateProduct = [
   check("name").isString().notEmpty(),

@@ -12,6 +12,7 @@ export const createCategoryService = async (
 
     if (existingCategory) {
       return res.status(400).json({
+        status: "error",
         error: "This category already exists",
       });
     }
@@ -22,10 +23,14 @@ export const createCategoryService = async (
 
     return res
       .status(201)
-      .json({ message: "Successfully created a new Category", category });
+      .json({
+        status: "success",
+        message: "Successfully created a new Category",
+        category,
+      });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ status: "error", error: "Internal Server Error" });
   }
 };
 
@@ -46,12 +51,16 @@ export const findCategoryByIdAndRespondService = async (
   const category = await Category.findById(categoryId);
 
   if (!category) {
-    return res.status(404).json({ error: "Category not found" });
+    return res
+      .status(404)
+      .json({ status: "error", error: "Category not found" });
   }
 
-  return res
-    .status(200)
-    .json({ message: "Successfully created a new Category", category });
+  return res.status(200).json({
+    status: "success",
+    message: "Successfully created a new Category",
+    category,
+  });
 };
 
 export const findCategoryByIdService = async (categoryId: string) => {
@@ -69,7 +78,9 @@ export const getCategoriesService = async (res: Response) => {
     const categories = await Category.find();
     return res.json(categories);
   } catch (error) {
-    return res.status(500).json({ error: "Internal Server Error" });
+    return res
+      .status(500)
+      .json({ status: "error", error: "Internal Server Error" });
   }
 };
 
@@ -81,12 +92,15 @@ export const updateCategoryService = async (
   const category = await findCategoryByIdService(categoryId);
 
   if (!category) {
-    return res.status(404).json({ error: "Category not found" });
+    return res
+      .status(404)
+      .json({ status: "error", error: "Category not found" });
   }
 
   await Category.updateOne({ _id: categoryId }, { ...data });
 
   return res.status(200).json({
+    status: "success",
     message: "Successfully updated category",
   });
 };
@@ -98,10 +112,14 @@ export const deleteCategoryService = async (
   const category = await findCategoryByIdService(categoryId);
 
   if (!category) {
-    return res.status(404).json({ error: "Category not found" });
+    return res
+      .status(404)
+      .json({ status: "error", error: "Category not found" });
   }
 
   await Category.deleteOne({ _id: categoryId });
 
-  return res.status(200).json({ message: "Successfully deleted category" });
+  return res
+    .status(200)
+    .json({ status: "success", message: "Successfully deleted category" });
 };

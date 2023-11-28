@@ -1,8 +1,8 @@
-import express, { Request, Response, NextFunction } from "express";
-require("dotenv").config();
+import express from "express";
 import mongoose from "mongoose";
-import { applicationRoutes } from "./routes";
 import { notFound } from "./middleware/notFound";
+import { applicationRoutes } from "./routes";
+require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -26,15 +26,15 @@ mongoose.connection.on("error", (err) => {
 app.use("/api/v1", applicationRoutes);
 app.use(notFound);
 
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error(`Error: ${err.message}`);
-  
-  if (err instanceof mongoose.Error.ValidationError) {
-    return res.status(400).json({ error: err.message });
-  }
-  
-  return res.status(500).json({ error: "Internal Server Error" });
-});
+// app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+//   console.error(`Error: ${err.message}`);
+
+//   if (err instanceof mongoose.Error.ValidationError) {
+//     return res.status(400).json({ error: err.message });
+//   }
+
+//   return res.status(500).json({ error: "Internal Server Error" });
+// });
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
