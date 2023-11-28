@@ -1,4 +1,4 @@
-import { check } from "express-validator";
+import { check, query } from "express-validator";
 
 export const validateProduct = [
   check("name").isString().notEmpty(),
@@ -32,4 +32,14 @@ export const validateProduct = [
 
       return true;
     }),
+];
+
+export const validateSearchProducts = [
+  query("name").exists().withMessage("Name is required"),
+  query("category").optional(),
+  query("pageSize")
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage("Invalid pageSize"),
+  query("page").optional().isInt({ min: 1 }).withMessage("Invalid page"),
 ];

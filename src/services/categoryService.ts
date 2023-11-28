@@ -21,13 +21,11 @@ export const createCategoryService = async (
       name,
     });
 
-    return res
-      .status(201)
-      .json({
-        status: "success",
-        message: "Successfully created a new Category",
-        category,
-      });
+    return res.status(201).json({
+      status: "success",
+      message: "Successfully created a new Category",
+      category,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ status: "error", error: "Internal Server Error" });
@@ -36,6 +34,20 @@ export const createCategoryService = async (
 
 export const findCategoryByNameService = async (categoryName: string) => {
   const category = Category.findOne({ name: categoryName });
+
+  if (!category) {
+    return null;
+  }
+
+  return category;
+};
+
+export const findCategoryBySearchedNameService = async (
+  categoryName: string
+) => {
+  const category = Category.findOne({
+    name: { $regex: new RegExp(categoryName, "i") },
+  });
 
   if (!category) {
     return null;
@@ -76,8 +88,13 @@ export const findCategoryByIdService = async (categoryId: string) => {
 export const getCategoriesService = async (res: Response) => {
   try {
     const categories = await Category.find();
-    return res.json(categories);
+    return res.status(200).json({
+      status: "success",
+      message: "Successfully retrieved all Products",
+      categories,
+    });
   } catch (error) {
+    console.log(error);
     return res
       .status(500)
       .json({ status: "error", error: "Internal Server Error" });
