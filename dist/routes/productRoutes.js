@@ -18,7 +18,7 @@ router.get("/get-products", authenticateToken_1.default, productController_1.get
 router.get("/get-product/:id", authenticateToken_1.default, userRouteValidators_1.validateId, validate_1.validate, productController_1.getProductById);
 router.get("/search-product", authenticateToken_1.default, productRouteValidators_1.validateSearchProducts, validate_1.validate, productController_1.searchProduct);
 router.get("/get-products-by-category", authenticateToken_1.default, productRouteValidators_1.validateGetProductsByCategory, validate_1.validate, productController_1.getProductsByCategory);
-router.patch("/update-product/:id", authenticateToken_1.default, userRouteValidators_1.validateId, validate_1.validate, productController_1.updateProduct);
+router.patch("/update-product-details/:id", authenticateToken_1.default, userRouteValidators_1.validateId, productRouteValidators_1.updateProductDetailsValidators, validate_1.validate, productController_1.updateProduct);
 router.patch("/update-product-image/:id", authenticateToken_1.default, fileUploader_1.uploadSingle, userRouteValidators_1.validateId, validate_1.validate, productController_1.updateProductImage);
-router.patch("/update-product-specifications/:id", authenticateToken_1.default, userRouteValidators_1.validateId, validate_1.validate, productController_1.updateProductSpecifications);
+router.patch("/update-product-specifications/:id", authenticateToken_1.default, userRouteValidators_1.validateId, productRouteValidators_1.updateProductSpecificationsValidators, validate_1.validate, productController_1.updateProductSpecifications);
 router.delete("/delete-product/:id", authenticateToken_1.default, userRouteValidators_1.validateId, validate_1.validate, productController_1.deleteProduct);

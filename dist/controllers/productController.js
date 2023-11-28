@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteProduct = exports.updateProductSpecifications = exports.updateProductImage = exports.updateProduct = exports.getProductsByCategory = exports.searchProduct = exports.getProductById = exports.getProducts = exports.createProduct = void 0;
 const express_validator_1 = require("express-validator");
@@ -36,11 +47,20 @@ const getProductsByCategory = (req, res) => __awaiter(void 0, void 0, void 0, fu
     yield (0, productService_1.getProductsByCategoryService)(category, res, page, pageSize);
 });
 exports.getProductsByCategory = getProductsByCategory;
-const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () { });
+const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const _a = (0, express_validator_1.matchedData)(req), { id } = _a, rest = __rest(_a, ["id"]);
+    yield (0, productService_1.updateProductService)(id, rest, res);
+});
 exports.updateProduct = updateProduct;
-const updateProductImage = (req, res) => __awaiter(void 0, void 0, void 0, function* () { });
+const updateProductImage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = (0, express_validator_1.matchedData)(req);
+    yield (0, productService_1.updateProductImageService)(id, req, res);
+});
 exports.updateProductImage = updateProductImage;
-const updateProductSpecifications = (req, res) => __awaiter(void 0, void 0, void 0, function* () { });
+const updateProductSpecifications = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id, specifications } = (0, express_validator_1.matchedData)(req);
+    yield (0, productService_1.updateProductSpecificationsService)(id, specifications, res);
+});
 exports.updateProductSpecifications = updateProductSpecifications;
 const deleteProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = (0, express_validator_1.matchedData)(req);

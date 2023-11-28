@@ -8,6 +8,9 @@ import {
   getProductByIdAndRespondService,
   getProductsByCategoryService,
   searchProductService,
+  updateProductImageService,
+  updateProductService,
+  updateProductSpecificationsService,
 } from "../services/productService";
 
 export const createProduct = async (req: Request, res: Response) => {
@@ -34,14 +37,23 @@ export const getProductsByCategory = async (req: Request, res: Response) => {
   await getProductsByCategoryService(category, res, page, pageSize);
 };
 
-export const updateProduct = async (req: Request, res: Response) => {};
+export const updateProduct = async (req: Request, res: Response) => {
+  const { id, ...rest } = matchedData(req);
+  await updateProductService(id, rest as CreateProductDto, res);
+};
 
-export const updateProductImage = async (req: Request, res: Response) => {};
+export const updateProductImage = async (req: Request, res: Response) => {
+  const { id } = matchedData(req);
+  await updateProductImageService(id, req, res);
+};
 
 export const updateProductSpecifications = async (
   req: Request,
   res: Response
-) => {};
+) => {
+  const { id, specifications } = matchedData(req);
+  await updateProductSpecificationsService(id, specifications, res);
+};
 
 export const deleteProduct = async (req: Request, res: Response) => {
   const { id } = matchedData(req);

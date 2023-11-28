@@ -12,6 +12,8 @@ import {
 } from "../controllers/productController";
 import authenticateToken from "../middleware/authenticateToken";
 import {
+  updateProductDetailsValidators,
+  updateProductSpecificationsValidators,
   validateGetProductsByCategory,
   validateProduct,
   validateSearchProducts,
@@ -57,9 +59,10 @@ router.get(
 );
 
 router.patch(
-  "/update-product/:id",
+  "/update-product-details/:id",
   authenticateToken,
   validateId,
+  updateProductDetailsValidators,
   validate,
   updateProduct
 );
@@ -77,6 +80,7 @@ router.patch(
   "/update-product-specifications/:id",
   authenticateToken,
   validateId,
+  updateProductSpecificationsValidators,
   validate,
   updateProductSpecifications
 );

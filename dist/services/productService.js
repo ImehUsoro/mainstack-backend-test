@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteProductService = exports.getProductsByCategoryService = exports.searchProductService = exports.getProductByIdAndRespondService = exports.getProductByIdService = exports.getAllProductsService = exports.findProductByNameService = exports.createProductService = void 0;
+exports.deleteProductService = exports.updateProductSpecificationsService = exports.updateProductImageService = exports.updateProductService = exports.getProductsByCategoryService = exports.searchProductService = exports.getProductByIdAndRespondService = exports.getProductByIdService = exports.getAllProductsService = exports.findProductByNameService = exports.createProductService = void 0;
 const Product_1 = __importDefault(require("../models/Product"));
 const fileUploader_1 = require("../utils/fileUploader");
 const categoryService_1 = require("./categoryService");
@@ -150,6 +150,52 @@ const getProductsByCategoryService = (category, res, page = 1, pageSize = 10) =>
     });
 });
 exports.getProductsByCategoryService = getProductsByCategoryService;
+const updateProductService = (productId, data, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const product = yield (0, exports.getProductByIdService)(productId);
+    if (!product) {
+        return res
+            .status(404)
+            .json({ status: "error", error: "Product not found" });
+    }
+    const updatedProduct = yield Product_1.default.updateOne({ _id: productId }, Object.assign({}, data));
+    return res.status(200).json({
+        status: "success",
+        message: "Successfully updated a Product",
+        product: updatedProduct,
+    });
+});
+exports.updateProductService = updateProductService;
+const updateProductImageService = (productId, req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const product = yield (0, exports.getProductByIdService)(productId);
+    if (!product) {
+        return res
+            .status(404)
+            .json({ status: "error", error: "Product not found" });
+    }
+    const { secure_url } = yield (0, fileUploader_1.uploadToCloudinary)(req);
+    const updatedProduct = yield Product_1.default.updateOne({ _id: productId }, { image_url: secure_url });
+    return res.status(200).json({
+        status: "success",
+        message: "Successfully updated a Product",
+        product: updatedProduct,
+    });
+});
+exports.updateProductImageService = updateProductImageService;
+const updateProductSpecificationsService = (productId, specifications, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const product = yield (0, exports.getProductByIdService)(productId);
+    if (!product) {
+        return res
+            .status(404)
+            .json({ status: "error", error: "Product not found" });
+    }
+    const updatedProduct = yield Product_1.default.updateOne({ _id: productId }, { specifications });
+    return res.status(200).json({
+        status: "success",
+        message: "Successfully updated a Product",
+        product: updatedProduct,
+    });
+});
+exports.updateProductSpecificationsService = updateProductSpecificationsService;
 const deleteProductService = (productId, res) => __awaiter(void 0, void 0, void 0, function* () {
     const product = yield (0, exports.getProductByIdService)(productId);
     if (!product) {

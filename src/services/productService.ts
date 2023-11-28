@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
-import { CreateProductDto } from "../dtos/products";
+import { CreateProductDto, SpecificationDto } from "../dtos/products";
 import Product from "../models/Product";
 import { uploadToCloudinary } from "../utils/fileUploader";
 import { findCategoryBySearchedNameService } from "./categoryService";
-import { get } from "mongoose";
 
 export const createProductService = async (
   req: Request,
@@ -168,6 +167,83 @@ export const getProductsByCategoryService = async (
     status: "success",
     message: "Successfully retrieved all Products",
     data: { products, total, currentPage, pageSize, totalPages },
+  });
+};
+
+export const updateProductService = async (
+  productId: string,
+  data: CreateProductDto,
+  res: Response
+) => {
+  const product = await getProductByIdService(productId);
+
+  if (!product) {
+    return res
+      .status(404)
+      .json({ status: "error", error: "Product not found" });
+  }
+
+  const updatedProduct = await Product.updateOne(
+    { _id: productId },
+    { ...data }
+  );
+
+  return res.status(200).json({
+    status: "success",
+    message: "Successfully updated a Product",
+    product: updatedProduct,
+  });
+};
+
+export const updateProductImageService = async (
+  productId: string,
+  req: Request,
+  res: Response
+) => {
+  const product = await getProductByIdService(productId);
+
+  if (!product) {
+    return res
+      .status(404)
+      .json({ status: "error", error: "Product not found" });
+  }
+
+  const { secure_url } = await uploadToCloudinary(req);
+
+  const updatedProduct = await Product.updateOne(
+    { _id: productId },
+    { image_url: secure_url }
+  );
+
+  return res.status(200).json({
+    status: "success",
+    message: "Successfully updated a Product",
+    product: updatedProduct,
+  });
+};
+
+export const updateProductSpecificationsService = async (
+  productId: string,
+  specifications: SpecificationDto[],
+  res: Response
+) => {
+  const product = await getProductByIdService(productId);
+
+  if (!product) {
+    return res
+      .status(404)
+      .json({ status: "error", error: "Product not found" });
+  }
+
+  const updatedProduct = await Product.updateOne(
+    { _id: productId },
+    { specifications }
+  );
+
+  return res.status(200).json({
+    status: "success",
+    message: "Successfully updated a Product",
+    product: updatedProduct,
   });
 };
 

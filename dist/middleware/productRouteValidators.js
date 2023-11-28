@@ -1,10 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateGetProductsByCategory = exports.validateSearchProducts = exports.validateProduct = void 0;
+exports.validateGetProductsByCategory = exports.validateSearchProducts = exports.updateProductSpecificationsValidators = exports.updateProductDetailsValidators = exports.validateProduct = void 0;
 const express_validator_1 = require("express-validator");
 exports.validateProduct = [
     (0, express_validator_1.check)("name").isString().notEmpty(),
-    (0, express_validator_1.check)("image_url").isString().notEmpty().optional(),
     (0, express_validator_1.check)("category").isString().notEmpty(),
     (0, express_validator_1.check)("description").isString().notEmpty().optional(),
     (0, express_validator_1.check)("quantityInStock").isNumeric(),
@@ -31,6 +30,28 @@ exports.validateProduct = [
         });
         return true;
     }),
+];
+exports.updateProductDetailsValidators = [
+    (0, express_validator_1.check)("name").isString().notEmpty().optional(),
+    (0, express_validator_1.check)("category").isString().notEmpty().optional(),
+    (0, express_validator_1.check)("description").isString().notEmpty().optional(),
+    (0, express_validator_1.check)("quantityInStock").isNumeric().optional(),
+    (0, express_validator_1.check)("visibility").isBoolean().optional(),
+];
+exports.updateProductSpecificationsValidators = [
+    (0, express_validator_1.body)("specifications")
+        .isArray({ min: 1 })
+        .withMessage("At least one specification is required"),
+    (0, express_validator_1.body)("specifications.*.name")
+        .exists()
+        .withMessage("Specification name is required")
+        .isString()
+        .withMessage("Specification name must be a string"),
+    (0, express_validator_1.body)("specifications.*.price")
+        .exists()
+        .withMessage("Specification price is required")
+        .isNumeric()
+        .withMessage("Specification price must be a number"),
 ];
 exports.validateSearchProducts = [
     (0, express_validator_1.query)("name").exists().withMessage("Name is required"),
