@@ -16,9 +16,11 @@ export const createUserService = async (body: CreateUserDto, res: Response) => {
       });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const user = await User.create({
       email,
-      password,
+      password: hashedPassword,
       firstName,
       lastName,
     });

@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "start": "nodemon --exec ts-node src/index.ts",
-    "test": "jest"
+    "dev": "nodemon --exec ts-node src/index.ts",
+    "build": "tsc -p .",
+    "test": "jest",
+    "start": "npm run build && node ./dist/index.js"
   },
   "author": "",
   "license": "ISC",

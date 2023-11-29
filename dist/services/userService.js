@@ -26,9 +26,10 @@ const createUserService = (body, res) => __awaiter(void 0, void 0, void 0, funct
                 error: "User with this email already exists",
             });
         }
+        const hashedPassword = yield bcrypt_1.default.hash(password, 10);
         const user = yield User_1.default.create({
             email,
-            password,
+            password: hashedPassword,
             firstName,
             lastName,
         });
