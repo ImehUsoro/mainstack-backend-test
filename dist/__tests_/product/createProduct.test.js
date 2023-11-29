@@ -15,8 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Product_1 = __importDefault(require("../../models/Product"));
 const productService_1 = require("../../services/productService");
 const fileUploader_1 = require("../../utils/fileUploader");
-jest.mock("../utils/fileUploader");
-jest.mock("./categoryService");
+jest.mock("../../utils/fileUploader");
+jest.mock("../../services/categoryService");
 describe("Product Service Tests", () => {
     const mockRequest = {};
     const mockResponse = {
@@ -35,12 +35,12 @@ describe("Product Service Tests", () => {
             description: "New Description",
             specifications: '[{ "name": "spec1", "value": "value1" }]',
         };
-        // Mock external services
+        // Correct way to mock the function
+        productService_1.findProductByNameService.mockResolvedValueOnce(null);
+        // Mocking other functions as before
         fileUploader_1.uploadToCloudinary.mockResolvedValueOnce({
             secure_url: "mocked_secure_url",
         });
-        // Mock database operations
-        productService_1.findProductByNameService.mockResolvedValueOnce(null);
         Product_1.default.create.mockResolvedValueOnce(Object.assign({ _id: "mockedProductId" }, createProductDto));
         yield (0, productService_1.createProductService)(mockRequest, mockResponse, createProductDto);
         expect(mockResponse.status).toHaveBeenCalledWith(201);

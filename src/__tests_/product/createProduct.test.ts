@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import Product from "../../models/Product";
 import {
-    createProductService,
-    findProductByNameService,
+  createProductService,
+  findProductByNameService,
 } from "../../services/productService";
 import { uploadToCloudinary } from "../../utils/fileUploader";
 
-jest.mock("../utils/fileUploader");
-jest.mock("./categoryService");
+jest.mock("../../utils/fileUploader");
+jest.mock("../../services/categoryService");
 
 describe("Product Service Tests", () => {
   const mockRequest = {} as Request;
@@ -30,13 +30,17 @@ describe("Product Service Tests", () => {
       specifications: '[{ "name": "spec1", "value": "value1" }]',
     };
 
-    // Mock external services
+    // Correct way to mock the function
+    (
+      findProductByNameService as jest.MockedFunction<
+        typeof findProductByNameService
+      >
+    ).mockResolvedValueOnce(null);
+
+    // Mocking other functions as before
     (uploadToCloudinary as jest.Mock).mockResolvedValueOnce({
       secure_url: "mocked_secure_url",
     });
-
-    // Mock database operations
-    (findProductByNameService as jest.Mock).mockResolvedValueOnce(null);
     (Product.create as jest.Mock).mockResolvedValueOnce({
       _id: "mockedProductId",
       ...createProductDto,
