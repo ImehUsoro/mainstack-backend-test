@@ -18,8 +18,9 @@ export const createProduct = async (req: Request, res: Response) => {
   await createProductService(req, res, data);
 };
 
-export const getProducts = async (_req: Request, res: Response) => {
-  await getAllProductsService(res);
+export const getProducts = async (req: Request, res: Response) => {
+  const { page, pageSize, visibility } = matchedData(req);
+  await getAllProductsService(res, page, pageSize, visibility);
 };
 
 export const getProductById = async (req: Request, res: Response) => {
@@ -28,13 +29,13 @@ export const getProductById = async (req: Request, res: Response) => {
 };
 
 export const searchProduct = async (req: Request, res: Response) => {
-  const { name, category, page, pageSize } = matchedData(req);
-  await searchProductService(name, res, page, pageSize, category);
+  const { name, category, visibility, page, pageSize } = matchedData(req);
+  await searchProductService(name, res, page, pageSize, category, visibility);
 };
 
 export const getProductsByCategory = async (req: Request, res: Response) => {
-  const { category, page, pageSize } = matchedData(req);
-  await getProductsByCategoryService(category, res, page, pageSize);
+  const { category, page, pageSize, visibility } = matchedData(req);
+  await getProductsByCategoryService(category, res, page, pageSize, visibility);
 };
 
 export const updateProduct = async (req: Request, res: Response) => {

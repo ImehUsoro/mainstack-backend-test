@@ -25,10 +25,14 @@ export const createUserService = async (body: CreateUserDto, res: Response) => {
       lastName,
     });
 
+    const userWithoutPassword = user.toObject();
+
+    const { password: _, ...rest } = userWithoutPassword;
+
     return res.status(201).json({
       status: "success",
       message: "Successfully created a new User",
-      user,
+      rest,
     });
   } catch (error) {
     console.error(error);
@@ -60,10 +64,14 @@ export const loginService = async (data: LoginUserDto, res: Response) => {
       lastName: user.lastName,
     });
 
+    const userWithoutPassword = user.toObject();
+
+    const { password: _, ...rest } = userWithoutPassword;
+
     return res.status(201).json({
       status: "success",
       message: "Login successful",
-      user,
+      user: rest,
       accessToken,
     });
   } catch (error) {
@@ -82,13 +90,32 @@ export const findUserByEmailService = async (email: string) => {
   return user;
 };
 
-export const getAllUsersService = async (res: Response) => {
+export const getAllUsersService = async (
+  res: Response,
+  page: number = 1,
+  pageSize: number = 10
+) => {
   try {
-    const users = await User.find({}).select("-password");
+    const skip = (page - 1) * pageSize;
+
+    const [users, total] = await Promise.all([
+      User.find().select("-password"),
+      User.countDocuments(),
+    ]);
+
+    const totalPages = Math.ceil(total / pageSize);
+    const currentPage = page > totalPages ? totalPages : page;
+
     return res.status(200).json({
       status: "success",
       message: "Users successfully retrieved",
-      users,
+      data: {
+        users,
+        total,
+        currentPage,
+        pageSize,
+        totalPages,
+      },
     });
   } catch (error) {
     console.error(error);

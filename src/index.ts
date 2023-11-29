@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import { notFound } from "./middleware/notFound";
 import { applicationRoutes } from "./routes";
+import requestLogger from "./middleware/requestLogger";
 require("dotenv").config();
 
 const app = express();
@@ -20,6 +21,7 @@ mongoose.connection.on("error", (err) => {
   console.error(`MongoDB connection error: ${err}`);
 });
 
+app.use(requestLogger);
 app.use("/api/v1", applicationRoutes);
 app.use(notFound);
 

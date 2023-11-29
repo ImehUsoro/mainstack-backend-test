@@ -9,6 +9,7 @@ import {
 } from "../controllers/userController";
 import authenticateToken from "../middleware/authenticateToken";
 import {
+  validateGetUsers,
   validateId,
   validateLogin,
   validateRegistration,
@@ -20,7 +21,13 @@ const router = Router();
 
 router.post("/register", validateRegistration, validate, registerUser);
 router.post("/login", validateLogin, validate, login);
-router.get("/get-users", authenticateToken, getAllUsers);
+router.get(
+  "/get-users",
+  authenticateToken,
+  validateGetUsers,
+  validate,
+  getAllUsers
+);
 router.get(
   "/get-user/:id",
   authenticateToken,

@@ -30,7 +30,8 @@ export const validateProduct = [
       });
 
       return true;
-    }),
+    })
+    .optional(),
 ];
 
 export const updateProductDetailsValidators = [
@@ -67,10 +68,30 @@ export const validateSearchProducts = [
     .isInt({ min: 1 })
     .withMessage("Invalid pageSize"),
   query("page").optional().isInt({ min: 1 }).withMessage("Invalid page"),
+  query("visibility")
+    .optional()
+    .isBoolean()
+    .withMessage("Invalid visibility value"),
 ];
 
 export const validateGetProductsByCategory = [
   query("category").exists().withMessage("Category is required"),
+  query("pageSize")
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage("Invalid pageSize"),
+  query("page").optional().isInt({ min: 1 }).withMessage("Invalid page"),
+  query("visibility")
+    .optional()
+    .isBoolean()
+    .withMessage("Invalid visibility value"),
+];
+
+export const validateGetProducts = [
+  query("visibility")
+    .optional()
+    .isBoolean()
+    .withMessage("Invalid visibility value"),
   query("pageSize")
     .optional()
     .isInt({ min: 1 })

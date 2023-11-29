@@ -14,6 +14,7 @@ import authenticateToken from "../middleware/authenticateToken";
 import {
   updateProductDetailsValidators,
   updateProductSpecificationsValidators,
+  validateGetProducts,
   validateGetProductsByCategory,
   validateProduct,
   validateSearchProducts,
@@ -32,7 +33,13 @@ router.post(
   validate,
   createProduct
 );
-router.get("/get-products", authenticateToken, getProducts);
+router.get(
+  "/get-products",
+  authenticateToken,
+  validateGetProducts,
+  validate,
+  getProducts
+);
 
 router.get(
   "/get-product/:id",

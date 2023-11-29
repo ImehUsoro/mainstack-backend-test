@@ -1,4 +1,4 @@
-import { body, check } from "express-validator";
+import { body, check, query } from "express-validator";
 
 export const validateRegistration = [
   body("firstName").notEmpty().withMessage("First name is required"),
@@ -33,4 +33,9 @@ export const validateUpdateUser = [
     .withMessage("Invalid user data format"),
   body("userData.firstName").notEmpty().isString().optional(),
   body("userData.lastName").notEmpty().isString().optional(),
+];
+
+export const validateGetUsers = [
+  query("page").isNumeric().optional(),
+  query("pageSize").isNumeric().optional(),
 ];

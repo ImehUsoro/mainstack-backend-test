@@ -2,7 +2,10 @@ import { Request, Response } from "express";
 import { CreateProductDto, SpecificationDto } from "../dtos/products";
 import Product from "../models/Product";
 import { uploadToCloudinary } from "../utils/fileUploader";
-import { findCategoryBySearchedNameService } from "./categoryService";
+import {
+  findCategoryByIdService,
+  findCategoryBySearchedNameService,
+} from "./categoryService";
 
 export const createProductService = async (
   req: Request,
@@ -25,10 +28,19 @@ export const createProductService = async (
       });
     }
 
+    const getCategory = await findCategoryByIdService(rest.category);
+
+    if (!getCategory) {
+      return res.status(400).json({
+        status: "error",
+        error: "Category does not exist",
+      });
+    }
+
     const { secure_url } = await uploadToCloudinary(req);
     const product = await Product.create({
       name,
-      specifications: JSON.parse(specifications),
+      specifications: specifications ? JSON.parse(specifications) : [],
       image_url: secure_url,
       ...rest,
     });
@@ -54,13 +66,42 @@ export const findProductByNameService = async (productName: string) => {
   return product;
 };
 
-export const getAllProductsService = async (res: Response) => {
+export const getAllProductsService = async (
+  res: Response,
+  page: number = 1,
+  pageSize: number = 10,
+  visibility?: boolean
+) => {
   try {
-    const products = await Product.find();
+    const query: {
+      [key: string]: boolean;
+    } = {};
+
+    if (visibility !== undefined) {
+      query.visibility = visibility;
+    }
+
+    const skip = (page - 1) * pageSize;
+
+    const [products, total] = await Promise.all([
+      Product.find(query)
+        .skip(skip)
+        .limit(pageSize)
+        .sort({ createdAt: -1 })
+        .populate({
+          path: "category",
+          select: "name",
+        }),
+      Product.countDocuments(query),
+    ]);
+
+    const totalPages = Math.ceil(total / pageSize);
+    const currentPage = page > totalPages ? totalPages : page;
+
     return res.status(200).json({
       status: "success",
       message: "Successfully retrieved all Products",
-      products,
+      data: { products, total, currentPage, pageSize, totalPages },
     });
   } catch (error) {
     console.error(error);
@@ -84,7 +125,10 @@ export const getProductByIdAndRespondService = async (
   productId: string,
   res: Response
 ) => {
-  const product = await Product.findById(productId);
+  const product = await Product.findById(productId).populate({
+    path: "category",
+    select: "name",
+  });
 
   if (!product) {
     return res
@@ -104,7 +148,8 @@ export const searchProductService = async (
   res: Response,
   page: number = 1,
   pageSize: number = 10,
-  category?: string
+  category?: string,
+  visibility?: boolean
 ) => {
   const query: any = {};
 
@@ -119,10 +164,21 @@ export const searchProductService = async (
     }
   }
 
+  if (visibility !== undefined) {
+    query.visibility = visibility;
+  }
+
   const skip = (page - 1) * pageSize;
 
   const [products, total] = await Promise.all([
-    Product.find(query).skip(skip).limit(pageSize).sort({ createdAt: -1 }),
+    Product.find(query)
+      .skip(skip)
+      .limit(pageSize)
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "category",
+        select: "name",
+      }),
     Product.countDocuments(query),
   ]);
 
@@ -140,7 +196,8 @@ export const getProductsByCategoryService = async (
   category: string,
   res: Response,
   page: number = 1,
-  pageSize: number = 10
+  pageSize: number = 10,
+  visibility?: boolean
 ) => {
   const foundCategory = await findCategoryBySearchedNameService(category);
 
@@ -150,14 +207,28 @@ export const getProductsByCategoryService = async (
       .json({ status: "error", error: "Category not found" });
   }
 
+  const query: {
+    [key: string]: boolean | string;
+  } = {
+    category: foundCategory._id,
+  };
+
+  if (visibility !== undefined) {
+    query.visibility = visibility;
+  }
+
   const skip = (page - 1) * pageSize;
 
   const [products, total] = await Promise.all([
-    Product.find({ category: foundCategory._id })
+    Product.find(query)
       .skip(skip)
       .limit(pageSize)
-      .sort({ createdAt: -1 }),
-    Product.countDocuments({ category: foundCategory._id }),
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "category",
+        select: "name",
+      }),
+    Product.countDocuments(query),
   ]);
 
   const totalPages = Math.ceil(total / pageSize);
@@ -181,6 +252,17 @@ export const updateProductService = async (
     return res
       .status(404)
       .json({ status: "error", error: "Product not found" });
+  }
+
+  if (data.category) {
+    const getCategory = await findCategoryByIdService(data.category);
+
+    if (!getCategory) {
+      return res.status(400).json({
+        status: "error",
+        error: "Category does not exist",
+      });
+    }
   }
 
   const updatedProduct = await Product.updateOne(

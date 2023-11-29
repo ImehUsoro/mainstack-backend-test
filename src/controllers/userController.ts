@@ -19,8 +19,9 @@ export const login = async (req: Request, res: Response) => {
   await loginService(body, res);
 };
 
-export const getAllUsers = async (_req: Request, res: Response) => {
-  await getAllUsersService(res);
+export const getAllUsers = async (req: Request, res: Response) => {
+  const { page, pageSize, visibility } = matchedData(req);
+  await getAllUsersService(res, page, pageSize);
 };
 
 export const getUserById = async (req: Request, res: Response) => {
