@@ -99,7 +99,7 @@ export const getAllUsersService = async (
     const skip = (page - 1) * pageSize;
 
     const [users, total] = await Promise.all([
-      User.find().select("-password"),
+      User.find().skip(skip).limit(pageSize).select("-password"),
       User.countDocuments(),
     ]);
 
