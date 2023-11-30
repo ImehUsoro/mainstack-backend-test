@@ -23,7 +23,7 @@ export const validateProduct = [
         throw new Error("Specifications cannot be empty");
       }
 
-      newVal.forEach((spec: any) => {
+      newVal.forEach((spec: { name: string; price: number }) => {
         if (!spec.name || !spec.price) {
           throw new Error("Invalid specifications format");
         }

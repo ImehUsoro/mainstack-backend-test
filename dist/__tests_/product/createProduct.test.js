@@ -50,5 +50,4 @@ describe("Product Service Tests", () => {
             product: Object.assign(Object.assign({ _id: "mockedProductId" }, createProductDto), { image_url: "mocked_secure_url" }),
         });
     }));
-    // Add more tests for other service functions following a similar pattern
 });

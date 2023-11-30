@@ -151,7 +151,9 @@ export const searchProductService = async (
   category?: string,
   visibility?: boolean
 ) => {
-  const query: any = {};
+  const query: {
+    [key: string]: boolean | { $regex: RegExp };
+  } = {};
 
   if (name) {
     query.name = { $regex: new RegExp(name, "i") };

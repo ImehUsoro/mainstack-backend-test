@@ -59,6 +59,4 @@ describe("Product Service Tests", () => {
       },
     });
   });
-
-  // Add more tests for other service functions following a similar pattern
 });
