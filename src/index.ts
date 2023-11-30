@@ -5,7 +5,7 @@ import { applicationRoutes } from "./routes";
 import requestLogger from "./middleware/requestLogger";
 require("dotenv").config();
 
-const app = express();
+export const app = express();
 const PORT = process.env.PORT || 8000;
 const MONGO_URI = process.env.MONGODB_URI || "";
 
