@@ -11,6 +11,7 @@ import {
 
 export const registerUser = async (req: Request, res: Response) => {
   const { body } = req;
+
   await createUserService(body, res);
 };
 
@@ -20,7 +21,7 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const getAllUsers = async (req: Request, res: Response) => {
-  const { page, pageSize, visibility } = matchedData(req);
+  const { page, pageSize } = matchedData(req);
   await getAllUsersService(res, page, pageSize);
 };
 
