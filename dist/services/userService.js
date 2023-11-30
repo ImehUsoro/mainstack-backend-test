@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -33,10 +44,12 @@ const createUserService = (body, res) => __awaiter(void 0, void 0, void 0, funct
             firstName,
             lastName,
         });
+        const userWithoutPassword = user.toObject();
+        const { password: _ } = userWithoutPassword, rest = __rest(userWithoutPassword, ["password"]);
         return res.status(201).json({
             status: "success",
             message: "Successfully created a new User",
-            user,
+            rest,
         });
     }
     catch (error) {
@@ -64,10 +77,12 @@ const loginService = (data, res) => __awaiter(void 0, void 0, void 0, function* 
             firstName: user.firstName,
             lastName: user.lastName,
         });
+        const userWithoutPassword = user.toObject();
+        const { password: _ } = userWithoutPassword, rest = __rest(userWithoutPassword, ["password"]);
         return res.status(201).json({
             status: "success",
             message: "Login successful",
-            user,
+            user: rest,
             accessToken,
         });
     }
@@ -85,13 +100,25 @@ const findUserByEmailService = (email) => __awaiter(void 0, void 0, void 0, func
     return user;
 });
 exports.findUserByEmailService = findUserByEmailService;
-const getAllUsersService = (res) => __awaiter(void 0, void 0, void 0, function* () {
+const getAllUsersService = (res, page = 1, pageSize = 10) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const users = yield User_1.default.find({}).select("-password");
+        const skip = (page - 1) * pageSize;
+        const [users, total] = yield Promise.all([
+            User_1.default.find().skip(skip).limit(pageSize).select("-password"),
+            User_1.default.countDocuments(),
+        ]);
+        const totalPages = Math.ceil(total / pageSize);
+        const currentPage = page > totalPages ? totalPages : page;
         return res.status(200).json({
             status: "success",
             message: "Users successfully retrieved",
-            users,
+            data: {
+                users,
+                total,
+                currentPage,
+                pageSize,
+                totalPages,
+            },
         });
     }
     catch (error) {

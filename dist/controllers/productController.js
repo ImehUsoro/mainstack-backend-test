@@ -28,8 +28,9 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     yield (0, productService_1.createProductService)(req, res, data);
 });
 exports.createProduct = createProduct;
-const getProducts = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield (0, productService_1.getAllProductsService)(res);
+const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { page, pageSize, visibility } = (0, express_validator_1.matchedData)(req);
+    yield (0, productService_1.getAllProductsService)(res, page, pageSize, visibility);
 });
 exports.getProducts = getProducts;
 const getProductById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -38,13 +39,13 @@ const getProductById = (req, res) => __awaiter(void 0, void 0, void 0, function*
 });
 exports.getProductById = getProductById;
 const searchProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, category, page, pageSize } = (0, express_validator_1.matchedData)(req);
-    yield (0, productService_1.searchProductService)(name, res, page, pageSize, category);
+    const { name, category, visibility, page, pageSize } = (0, express_validator_1.matchedData)(req);
+    yield (0, productService_1.searchProductService)(name, res, page, pageSize, category, visibility);
 });
 exports.searchProduct = searchProduct;
 const getProductsByCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { category, page, pageSize } = (0, express_validator_1.matchedData)(req);
-    yield (0, productService_1.getProductsByCategoryService)(category, res, page, pageSize);
+    const { category, page, pageSize, visibility } = (0, express_validator_1.matchedData)(req);
+    yield (0, productService_1.getProductsByCategoryService)(category, res, page, pageSize, visibility);
 });
 exports.getProductsByCategory = getProductsByCategory;
 const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

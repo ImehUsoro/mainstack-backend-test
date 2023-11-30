@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateGetProductsByCategory = exports.validateSearchProducts = exports.updateProductSpecificationsValidators = exports.updateProductDetailsValidators = exports.validateProduct = void 0;
+exports.validateGetProducts = exports.validateGetProductsByCategory = exports.validateSearchProducts = exports.updateProductSpecificationsValidators = exports.updateProductDetailsValidators = exports.validateProduct = void 0;
 const express_validator_1 = require("express-validator");
 exports.validateProduct = [
     (0, express_validator_1.check)("name").isString().notEmpty(),
@@ -29,7 +29,8 @@ exports.validateProduct = [
             }
         });
         return true;
-    }),
+    })
+        .optional(),
 ];
 exports.updateProductDetailsValidators = [
     (0, express_validator_1.check)("name").isString().notEmpty().optional(),
@@ -61,9 +62,28 @@ exports.validateSearchProducts = [
         .isInt({ min: 1 })
         .withMessage("Invalid pageSize"),
     (0, express_validator_1.query)("page").optional().isInt({ min: 1 }).withMessage("Invalid page"),
+    (0, express_validator_1.query)("visibility")
+        .optional()
+        .isBoolean()
+        .withMessage("Invalid visibility value"),
 ];
 exports.validateGetProductsByCategory = [
     (0, express_validator_1.query)("category").exists().withMessage("Category is required"),
+    (0, express_validator_1.query)("pageSize")
+        .optional()
+        .isInt({ min: 1 })
+        .withMessage("Invalid pageSize"),
+    (0, express_validator_1.query)("page").optional().isInt({ min: 1 }).withMessage("Invalid page"),
+    (0, express_validator_1.query)("visibility")
+        .optional()
+        .isBoolean()
+        .withMessage("Invalid visibility value"),
+];
+exports.validateGetProducts = [
+    (0, express_validator_1.query)("visibility")
+        .optional()
+        .isBoolean()
+        .withMessage("Invalid visibility value"),
     (0, express_validator_1.query)("pageSize")
         .optional()
         .isInt({ min: 1 })

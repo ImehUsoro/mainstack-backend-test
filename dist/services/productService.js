@@ -40,8 +40,15 @@ const createProductService = (req, res, data) => __awaiter(void 0, void 0, void 
                 error: "This product already exists",
             });
         }
+        const getCategory = yield (0, categoryService_1.findCategoryByIdService)(rest.category);
+        if (!getCategory) {
+            return res.status(400).json({
+                status: "error",
+                error: "Category does not exist",
+            });
+        }
         const { secure_url } = yield (0, fileUploader_1.uploadToCloudinary)(req);
-        const product = yield Product_1.default.create(Object.assign({ name, specifications: JSON.parse(specifications), image_url: secure_url }, rest));
+        const product = yield Product_1.default.create(Object.assign({ name, specifications: specifications ? JSON.parse(specifications) : [], image_url: secure_url }, rest));
         return res.status(201).json({
             status: "success",
             message: "Successfully created a new Product",
@@ -62,13 +69,30 @@ const findProductByNameService = (productName) => __awaiter(void 0, void 0, void
     return product;
 });
 exports.findProductByNameService = findProductByNameService;
-const getAllProductsService = (res) => __awaiter(void 0, void 0, void 0, function* () {
+const getAllProductsService = (res, page = 1, pageSize = 10, visibility) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const products = yield Product_1.default.find();
+        const query = {};
+        if (visibility !== undefined) {
+            query.visibility = visibility;
+        }
+        const skip = (page - 1) * pageSize;
+        const [products, total] = yield Promise.all([
+            Product_1.default.find(query)
+                .skip(skip)
+                .limit(pageSize)
+                .sort({ createdAt: -1 })
+                .populate({
+                path: "category",
+                select: "name",
+            }),
+            Product_1.default.countDocuments(query),
+        ]);
+        const totalPages = Math.ceil(total / pageSize);
+        const currentPage = page > totalPages ? totalPages : page;
         return res.status(200).json({
             status: "success",
             message: "Successfully retrieved all Products",
-            products,
+            data: { products, total, currentPage, pageSize, totalPages },
         });
     }
     catch (error) {
@@ -88,7 +112,10 @@ const getProductByIdService = (productId) => __awaiter(void 0, void 0, void 0, f
 });
 exports.getProductByIdService = getProductByIdService;
 const getProductByIdAndRespondService = (productId, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const product = yield Product_1.default.findById(productId);
+    const product = yield Product_1.default.findById(productId).populate({
+        path: "category",
+        select: "name",
+    });
     if (!product) {
         return res
             .status(404)
@@ -101,7 +128,7 @@ const getProductByIdAndRespondService = (productId, res) => __awaiter(void 0, vo
     });
 });
 exports.getProductByIdAndRespondService = getProductByIdAndRespondService;
-const searchProductService = (name, res, page = 1, pageSize = 10, category) => __awaiter(void 0, void 0, void 0, function* () {
+const searchProductService = (name, res, page = 1, pageSize = 10, category, visibility) => __awaiter(void 0, void 0, void 0, function* () {
     const query = {};
     if (name) {
         query.name = { $regex: new RegExp(name, "i") };
@@ -112,9 +139,19 @@ const searchProductService = (name, res, page = 1, pageSize = 10, category) => _
             query.category = foundCategory._id;
         }
     }
+    if (visibility !== undefined) {
+        query.visibility = visibility;
+    }
     const skip = (page - 1) * pageSize;
     const [products, total] = yield Promise.all([
-        Product_1.default.find(query).skip(skip).limit(pageSize).sort({ createdAt: -1 }),
+        Product_1.default.find(query)
+            .skip(skip)
+            .limit(pageSize)
+            .sort({ createdAt: -1 })
+            .populate({
+            path: "category",
+            select: "name",
+        }),
         Product_1.default.countDocuments(query),
     ]);
     const totalPages = Math.ceil(total / pageSize);
@@ -126,20 +163,30 @@ const searchProductService = (name, res, page = 1, pageSize = 10, category) => _
     });
 });
 exports.searchProductService = searchProductService;
-const getProductsByCategoryService = (category, res, page = 1, pageSize = 10) => __awaiter(void 0, void 0, void 0, function* () {
+const getProductsByCategoryService = (category, res, page = 1, pageSize = 10, visibility) => __awaiter(void 0, void 0, void 0, function* () {
     const foundCategory = yield (0, categoryService_1.findCategoryBySearchedNameService)(category);
     if (!foundCategory) {
         return res
             .status(404)
             .json({ status: "error", error: "Category not found" });
     }
+    const query = {
+        category: foundCategory._id,
+    };
+    if (visibility !== undefined) {
+        query.visibility = visibility;
+    }
     const skip = (page - 1) * pageSize;
     const [products, total] = yield Promise.all([
-        Product_1.default.find({ category: foundCategory._id })
+        Product_1.default.find(query)
             .skip(skip)
             .limit(pageSize)
-            .sort({ createdAt: -1 }),
-        Product_1.default.countDocuments({ category: foundCategory._id }),
+            .sort({ createdAt: -1 })
+            .populate({
+            path: "category",
+            select: "name",
+        }),
+        Product_1.default.countDocuments(query),
     ]);
     const totalPages = Math.ceil(total / pageSize);
     const currentPage = page > totalPages ? totalPages : page;
@@ -156,6 +203,15 @@ const updateProductService = (productId, data, res) => __awaiter(void 0, void 0,
         return res
             .status(404)
             .json({ status: "error", error: "Product not found" });
+    }
+    if (data.category) {
+        const getCategory = yield (0, categoryService_1.findCategoryByIdService)(data.category);
+        if (!getCategory) {
+            return res.status(400).json({
+                status: "error",
+                error: "Category does not exist",
+            });
+        }
     }
     const updatedProduct = yield Product_1.default.updateOne({ _id: productId }, Object.assign({}, data));
     return res.status(200).json({

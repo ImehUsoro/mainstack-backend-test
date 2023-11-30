@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateUpdateUser = exports.validateId = exports.validateLogin = exports.validateRegistration = void 0;
+exports.validateGetUsers = exports.validateUpdateUser = exports.validateId = exports.validateLogin = exports.validateRegistration = void 0;
 const express_validator_1 = require("express-validator");
 exports.validateRegistration = [
     (0, express_validator_1.body)("firstName").notEmpty().withMessage("First name is required"),
@@ -32,4 +32,8 @@ exports.validateUpdateUser = [
         .withMessage("Invalid user data format"),
     (0, express_validator_1.body)("userData.firstName").notEmpty().isString().optional(),
     (0, express_validator_1.body)("userData.lastName").notEmpty().isString().optional(),
+];
+exports.validateGetUsers = [
+    (0, express_validator_1.query)("page").isNumeric().optional(),
+    (0, express_validator_1.query)("pageSize").isNumeric().optional(),
 ];

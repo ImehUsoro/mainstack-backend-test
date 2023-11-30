@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteUser = exports.updateUser = exports.getUserById = exports.getAllUsers = exports.login = exports.registerUser = void 0;
+const express_validator_1 = require("express-validator");
 const userService_1 = require("../services/userService");
 const registerUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { body } = req;
@@ -21,8 +22,9 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, userService_1.loginService)(body, res);
 });
 exports.login = login;
-const getAllUsers = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield (0, userService_1.getAllUsersService)(res);
+const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { page, pageSize } = (0, express_validator_1.matchedData)(req);
+    yield (0, userService_1.getAllUsersService)(res, page, pageSize);
 });
 exports.getAllUsers = getAllUsers;
 const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

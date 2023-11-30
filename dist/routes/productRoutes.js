@@ -14,7 +14,7 @@ const fileUploader_1 = require("../utils/fileUploader");
 const router = (0, express_1.Router)();
 exports.productRoutes = router;
 router.post("/create-product", authenticateToken_1.default, fileUploader_1.uploadSingle, productRouteValidators_1.validateProduct, validate_1.validate, productController_1.createProduct);
-router.get("/get-products", authenticateToken_1.default, productController_1.getProducts);
+router.get("/get-products", authenticateToken_1.default, productRouteValidators_1.validateGetProducts, validate_1.validate, productController_1.getProducts);
 router.get("/get-product/:id", authenticateToken_1.default, userRouteValidators_1.validateId, validate_1.validate, productController_1.getProductById);
 router.get("/search-product", authenticateToken_1.default, productRouteValidators_1.validateSearchProducts, validate_1.validate, productController_1.searchProduct);
 router.get("/get-products-by-category", authenticateToken_1.default, productRouteValidators_1.validateGetProductsByCategory, validate_1.validate, productController_1.getProductsByCategory);

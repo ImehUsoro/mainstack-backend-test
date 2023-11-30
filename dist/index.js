@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const notFound_1 = require("./middleware/notFound");
 const routes_1 = require("./routes");
+const requestLogger_1 = __importDefault(require("./middleware/requestLogger"));
 require("dotenv").config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 8000;
@@ -19,6 +20,7 @@ mongoose_1.default.connection.on("connected", () => {
 mongoose_1.default.connection.on("error", (err) => {
     console.error(`MongoDB connection error: ${err}`);
 });
+app.use(requestLogger_1.default);
 app.use("/api/v1", routes_1.applicationRoutes);
 app.use(notFound_1.notFound);
 app.listen(PORT, () => {
